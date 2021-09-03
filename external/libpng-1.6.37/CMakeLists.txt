@@ -268,11 +268,19 @@ if(UNIX)
   symbol_prefix()
 endif()
 
-find_program(AWK NAMES gawk awk)
+# @dbotha: Fix libconfpng.c is attached to multiple targets error. See
+# https://github.com/glennrp/libpng/issues/394
+if(CMAKE_GENERATOR MATCHES "Xcode" AND CMAKE_XCODE_BUILD_SYSTEM MATCHES 12)
+  message(WARNING "libpng does not currently support generating files for multiple targets using the Xcode \"new build system\", libpng will use the prebuilt pnglibconf instead")
+  set(PNG_XCODE_NEW_BUILD_SYSTEM true)
+else()
+  set(PNG_XCODE_NEW_BUILD_SYSTEM false)
+  find_program(AWK NAMES gawk awk)
+endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-if(NOT AWK OR ANDROID)
+if (PNG_XCODE_NEW_BUILD_SYSTEM OR NOT AWK OR ANDROID OR IOS)
   # No awk available to generate sources; use pre-built pnglibconf.h
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
@@ -451,7 +459,7 @@ else()
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk"
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out"
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out")
-endif(NOT AWK OR ANDROID)
+endif(PNG_XCODE_NEW_BUILD_SYSTEM OR NOT AWK OR ANDROID OR IOS)
 
 # OUR SOURCES
 set(libpng_public_hdrs
@@ -465,7 +473,7 @@ set(libpng_private_hdrs
   pnginfo.h
   pngstruct.h
 )
-if(AWK AND NOT ANDROID)
+if(NOT PNG_XCODE_NEW_BUILD_SYSTEM AND AWK AND NOT ANDROID AND NOT IOS)
   list(APPEND libpng_private_hdrs "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h")
 endif()
 set(libpng_sources

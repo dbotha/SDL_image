@@ -40,6 +40,13 @@ target_compile_definitions(SDL2_image PRIVATE
 		-DLOAD_BMP -DLOAD_GIF -DLOAD_LBM -DLOAD_PCX -DLOAD_PNM
 		-DLOAD_TGA -DLOAD_XCF -DLOAD_XPM -DLOAD_XV -DLOAD_XPM)
 
+# @dbotha - we need to set the -fno-objc-arc linker flag on the SDL2_image
+# target on iOS as we'll be adding SDL_image as a dependency to a project where
+# arc is enabled
+if (IOS)
+	target_compile_options(SDL2_image PRIVATE "-fno-objc-arc")
+endif()
+
 if (SUPPORT_JPG)
 	target_compile_definitions(SDL2_image PRIVATE -DLOAD_JPG)
 	add_subdirectory(external/jpeg-9d)
