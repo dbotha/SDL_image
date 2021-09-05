@@ -271,7 +271,7 @@ endif()
 # @dbotha: Fix libconfpng.c is attached to multiple targets error. See
 # https://github.com/glennrp/libpng/issues/394
 if(CMAKE_GENERATOR MATCHES "Xcode" AND CMAKE_XCODE_BUILD_SYSTEM MATCHES 12)
-  message(WARNING "libpng does not currently support generating files for multiple targets using the Xcode \"new build system\", libpng will use the prebuilt pnglibconf instead")
+  message(WARNING "@dbotha: libpng does not currently support generating files for multiple targets using the Xcode \"new build system\", libpng will use the prebuilt pnglibconf instead")
   set(PNG_XCODE_NEW_BUILD_SYSTEM true)
 else()
   set(PNG_XCODE_NEW_BUILD_SYSTEM false)
